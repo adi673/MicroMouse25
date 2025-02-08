@@ -2,6 +2,19 @@
 
 int count_pulses_left = 0, count_pulses_right = 0;
 
+// **Define motor control pins before creating MotorController instances**
+#define M1_ENC_A PB3    // Left Encoder A
+#define M1_ENC_B PA15   // Left Encoder B
+#define M2_ENC_A PB9    // Right Encoder A
+#define M2_ENC_B PB8    // Right Encoder B
+
+// Motor Control Pins
+#define M1_PWM PA0    // Left Motor PWM
+#define M2_PWM PA1    // Right Motor PWM
+#define M1_in1 PA2     // Left Motor Direction 1
+#define M1_in2 PA3     // Left Motor Direction 2
+#define M2_in1 PA4     // Right Motor Direction 1
+#define M2_in2 PA5     // Right Motor Direction 2
 
 
 
@@ -99,19 +112,6 @@ void p2p_pid(MotorController& m1, MotorController& m2, int dist, double error_th
 //     }
 // }
 
-// **Define motor control pins before creating MotorController instances**
-#define M1_ENC_A PB3    // Left Encoder A
-#define M1_ENC_B PA15   // Left Encoder B
-#define M2_ENC_A PB9    // Right Encoder A
-#define M2_ENC_B PB8    // Right Encoder B
-
-// Motor Control Pins
-#define M1_PWM PA0    // Left Motor PWM
-#define M2_PWM PA1    // Right Motor PWM
-#define M1_in1 PA2     // Left Motor Direction 1
-#define M1_in2 PA3     // Left Motor Direction 2
-#define M2_in1 PA4     // Right Motor Direction 1
-#define M2_in2 PA5     // Right Motor Direction 2
 
 MotorController motor1(M1_in1, M1_in2, M1_ENC_A, M1_ENC_B, M1_PWM);
 MotorController motor2(M2_in1, M2_in2, M2_ENC_A, M2_ENC_B, M2_PWM);
