@@ -1,5 +1,4 @@
-#define OPTIMUM_SPEED 150
-#define WHEEL_DIAMETER 10.681415
+#include <Arduino.h>
 
 // Encoder Pins
 #define M1_ENC_A PB3    // Left Encoder A
@@ -15,74 +14,90 @@
 #define M2_in1 PA4     // Right Motor Direction 1
 #define M2_in2 PA5     // Right Motor Direction 2
 
-// Push Button
-#define PUSH_BUTTON PB15
+// Variables to store encoder counts
+volatile int leftEncoderCount = 0;
+volatile int rightEncoderCount = 0;
 
-int m1_count_pulses = 0;
-int m2_count_pulses = 0;
-
-void setup()
-{
-  Serial.begin(9600);                // activates the serial communication
-  pinMode(M1_ENC_A, INPUT); // sets the Encoder_output_A pin as the input
-  pinMode(M1_ENC_B, INPUT); // sets the Encoder_output_B pin as the input
-  pinMode(M1_PWM, OUTPUT);
-  pinMode(M1_in1, OUTPUT);
-  pinMode(M1_in2, OUTPUT);
-  attachInterrupt(digitalPinToInterrupt(M1_ENC_A), M1_Encoder_Interrupt, RISING);
-
-  pinMode(M2_ENC_A, INPUT); // sets the Encoder_output_A pin as the input
-  pinMode(M2_ENC_B, INPUT); // sets the Encoder_output_B pin as the input
-  pinMode(M2_PWM, OUTPUT);
-  pinMode(M2_in1, OUTPUT);
-  pinMode(M2_in2, OUTPUT);
-  attachInterrupt(digitalPinToInterrupt(M2_ENC_A), M2_Encoder_Interrupt, RISING);
-
-  
-  
-
-  
+void leftEncoderISR() {
+    if (digitalRead(M1_ENC_A) == digitalRead(M1_ENC_B)) {
+        leftEncoderCount++;
+    } else {
+        leftEncoderCount--;
+    }
 }
 
-void loop()
-{
-  digitalWrite(M1_in1, HIGH);
-  digitalWrite(M1_in2, LOW);
-
-  digitalWrite(M2_in1, HIGH);
-  digitalWrite(M2_in2, LOW);
-
-  analogWrite(M1_PWM, 255);
-  analogWrite(M2_PWM, 255);
-  
-  Serial.println("Result A: ");
-  Serial.println(m1_count_pulses);
-  Serial.print("Results B:");
-  Serial.println(m2_count_pulses);
-  delay(100);
+void rightEncoderISR() {
+    if (digitalRead(M2_ENC_A) == digitalRead(M2_ENC_B)) {
+        rightEncoderCount++;
+    } else {
+        rightEncoderCount--;
+    }
 }
 
-void M1_Encoder_Interrupt()
-{
-  int b = digitalRead(M1_ENC_B);
-  if (b > 0)
-  {
-    m1_count_pulses++;
-  }
-  else
-  {
-    m1_count_pulses--;
-  }
+void Motor_SetSpeed(int spdL, int spdR){
+    if (spdL == 0){
+        digitalWrite(M1_in1, LOW);
+        digitalWrite(M1_in2, LOW);
+        analogWrite(M1_PWM, 0);
+    }
+    else if (spdL < 0){
+        analogWrite(M1_PWM, -spdL);
+        digitalWrite(M1_in1, LOW);
+        digitalWrite(M1_in2, HIGH);
+    }
+    else{
+        analogWrite(M1_PWM, spdL);
+        digitalWrite(M1_in1, HIGH);
+        digitalWrite(M1_in2, LOW);
+    }
+
+    if (spdR == 0){
+        digitalWrite(M2_in1, LOW);
+        digitalWrite(M2_in2, LOW);
+        analogWrite(M2_PWM, 0);
+    }
+    else if (spdR < 0){
+        analogWrite(M2_PWM, -spdR);
+        digitalWrite(M2_in1, LOW);
+        digitalWrite(M2_in2, HIGH);
+    }
+    else{
+        analogWrite(M2_PWM, spdR);
+        digitalWrite(M2_in1, HIGH);
+        digitalWrite(M2_in2, LOW);
+    }
 }
-void M2_Encoder_Interrupt()
-{
-  int c = digitalRead(M2_ENC_B);
-  if (c > 0)
-  {
-    m2_count_pulses++;
-  }
-  else
-  {
-    m2_count_pulses--;
-  }
+
+void brake(){
+    digitalWrite(M1_in1, LOW);
+    digitalWrite(M1_in2, LOW);
+    digitalWrite(M2_in1, LOW);
+    digitalWrite(M2_in2, LOW);
+}
+
+void setup() {
+    delay(5000);  // Wait for 5 seconds before starting
+    Serial.begin(115200);
+    pinMode(M1_ENC_A, INPUT_PULLUP);
+    pinMode(M1_ENC_B, INPUT_PULLUP);
+    pinMode(M2_ENC_A, INPUT_PULLUP);
+    pinMode(M2_ENC_B, INPUT_PULLUP);
+    pinMode(M1_PWM, OUTPUT);
+    pinMode(M2_PWM, OUTPUT);
+    pinMode(M1_in1, OUTPUT);
+    pinMode(M1_in2, OUTPUT);
+    pinMode(M2_in1, OUTPUT);
+    pinMode(M2_in2, OUTPUT);
+
+    attachInterrupt(digitalPinToInterrupt(M1_ENC_A), leftEncoderISR, CHANGE);
+    attachInterrupt(digitalPinToInterrupt(M2_ENC_B), rightEncoderISR, CHANGE);
+}
+
+void loop() {
+    Motor_SetSpeed(50, 50);  // Increased speed for better PWM range
+    Serial.print("Left Encoder: ");
+    Serial.print(leftEncoderCount);
+    Serial.print(" | Right Encoder: ");
+    Serial.println(rightEncoderCount);
+    delay(500);
 }
