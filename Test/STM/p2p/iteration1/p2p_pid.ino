@@ -93,15 +93,33 @@ void p2p_pid(MotorController m1, MotorController m2, int dist, double error_thre
     }
 }
 
+// Global pointers to our MotorController objects (needed for ISRs)
+MotorController* motor1Ptr = nullptr;
+MotorController* motor2Ptr = nullptr;
 
+void M1_Encoder_ISR() {
+    if (motor1Ptr) {
+        motor1Ptr->encoderInterrupt();
+    }
+}
+
+void M2_Encoder_ISR() {
+    if (motor2Ptr) {
+        motor2Ptr->encoderInterrupt();
+    }
+}
 
 MotorController motor1(M1_in1, M1_in2, M1_ENC_A, M1_ENC_B, M1_PWM);
 MotorController motor2(M2_in1, M2_in2, M2_ENC_A, M2_ENC_B, M2_PWM);
 
 void setup(){
   Serial.begin(9600);
-  attachInterrupt(digitalPinToInterrupt(3), encoderInterrupt_left, RISING);
-  attachInterrupt(digitalPinToInterrupt(2), encoderInterrupt_right, RISING);
+   motor1Ptr = &motor1;
+    motor2Ptr = &motor2;
+
+    // Attach interrupts for each motor's encoder (using the encoder A pins)
+    attachInterrupt(digitalPinToInterrupt(M1_ENC_A), M1_Encoder_ISR, RISING);
+    attachInterrupt(digitalPinToInterrupt(M2_ENC_B), M2_Encoder_ISR, RISING);
 }
 
 void loop()
