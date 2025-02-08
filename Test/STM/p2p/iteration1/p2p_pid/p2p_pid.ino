@@ -2,6 +2,29 @@
 
 int count_pulses_left = 0, count_pulses_right = 0;
 
+
+
+
+void encoderInterrupt_left() {
+    int b = digitalRead(M1_ENC_B);
+    if (b > 0) {
+        count_pulses_left++;
+    }
+    else {
+        count_pulses_left--;
+    }
+}
+
+void encoderInterrupt_right() {
+    int b = digitalRead(M2_ENC_B);
+    if (b > 0) {
+        count_pulses_right++;
+    }
+    else {
+        count_pulses_right--;
+    }
+}
+
 void p2p_pid(MotorController& m1, MotorController& m2, int dist, double error_thresh = 0.3, int ramp_duration = 5000) 
 {  // **Fixed incorrect function signature (pass by reference)**
     double setpnt_counts = m1.req_counts(dist);
@@ -61,20 +84,20 @@ void p2p_pid(MotorController& m1, MotorController& m2, int dist, double error_th
 }
 
 // Global pointers to our MotorController objects (needed for ISRs)
-MotorController* motor1Ptr = nullptr;
-MotorController* motor2Ptr = nullptr;
+// MotorController* motor1Ptr = nullptr;
+// MotorController* motor2Ptr = nullptr;
 
-void M1_Encoder_ISR() {
-    if (motor1Ptr) {
-        motor1Ptr->encoderInterrupt();
-    }
-}
+// void M1_Encoder_ISR() {
+//     if (motor1Ptr) {
+//         motor1Ptr->encoderInterrupt();
+//     }
+// }
 
-void M2_Encoder_ISR() {
-    if (motor2Ptr) {
-        motor2Ptr->encoderInterrupt();
-    }
-}
+// void M2_Encoder_ISR() {
+//     if (motor2Ptr) {
+//         motor2Ptr->encoderInterrupt();
+//     }
+// }
 
 // **Define motor control pins before creating MotorController instances**
 #define M1_ENC_A PB3    // Left Encoder A
@@ -95,11 +118,10 @@ MotorController motor2(M2_in1, M2_in2, M2_ENC_A, M2_ENC_B, M2_PWM);
 
 void setup() {
     Serial.begin(9600);
-    motor1Ptr = &motor1;
-    motor2Ptr = &motor2;
+   
 
-    attachInterrupt(digitalPinToInterrupt(M1_ENC_A), M1_Encoder_ISR, RISING);
-    attachInterrupt(digitalPinToInterrupt(M2_ENC_A), M2_Encoder_ISR, RISING);  // **Fixed incorrect interrupt pin**
+    attachInterrupt(digitalPinToInterrupt(M1_ENC_A), encoderInterrupt_left, RISING);
+    attachInterrupt(digitalPinToInterrupt(M2_ENC_B), encoderInterrupt_right, RISING);
 }
 
 void loop() {
