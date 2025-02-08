@@ -177,7 +177,7 @@ void encoderInterrupt_right() {
 
 void p2p_pid(MotorController& m1, MotorController& m2, int dist, double error_thresh = 0.3, int ramp_duration = 5000)  
 {
-    double setpnt_counts = m1.req_counts(dist);
+     double setpnt_counts = 385.422; //m1.req_counts(dist);
     Serial.print("Required counts: ");
     Serial.println(setpnt_counts);
 
@@ -281,5 +281,5 @@ void loop() {
     p2p_pid(motor1, motor2, 25);
     motor1.rotate(0,0);
     motor2.rotate(0,0);
-    delay(10000);
+    delay(4000);
 }
