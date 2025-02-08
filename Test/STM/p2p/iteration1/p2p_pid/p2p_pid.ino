@@ -1,36 +1,10 @@
-#include "./motorcontroller.hpp"
+#include "motorcontroller.hpp"  // **Fixed incorrect inclusion syntax**
 
-int count_pulses_left = 0, count_pulses_right =0;
+int count_pulses_left = 0, count_pulses_right = 0;
 
-// void encoderInterrupt_left(){
-//     int b = digitalRead(5);
-//     if (b > 0)
-//     {
-//         count_pulses_left++;
-//     }
-//     else
-//     {
-//         count_pulses_left--;
-//     }
-// }
-
-// void encoderInterrupt_right(){
-//     int b = digitalRead(4);
-//     if (b > 0)
-//     {
-//         count_pulses_right++;
-//     }
-//     else
-//     {
-//         count_pulses_right--;
-//     }
-// }
-
-void p2p_pid(MotorController m1, MotorController m2, int dist, double error_thresh = 0.3, int ramp_duration = 5000)
-{
-    // PID Controller. Used to control the speed of the bot. Function
-
-    double setpnt_counts = m1.req_counts(dist); // number of counts required to reach the set point
+void p2p_pid(MotorController& m1, MotorController& m2, int dist, double error_thresh = 0.3, int ramp_duration = 5000) 
+{  // **Fixed incorrect function signature (pass by reference)**
+    double setpnt_counts = m1.req_counts(dist);
 
     count_pulses_left = 0;
     count_pulses_right = 0;
@@ -42,19 +16,14 @@ void p2p_pid(MotorController m1, MotorController m2, int dist, double error_thre
     double previous_error = 0, previous_sync = 0;
 
     unsigned long start_time = millis();
-    int initial_speed = 20; // Initial speed
+    int initial_speed = 20;
 
-    while (true)
-    {
-        // Calculate elapsed time
+    while (true) {
         unsigned long elapsed_time = millis() - start_time;
-
-        // Gradually increase speed over ramp duration
         int target_speed = map(constrain(elapsed_time, 0, ramp_duration), 0, ramp_duration, initial_speed, 200);
 
         double error_distance = abs(setpnt_counts) - abs(count_pulses_left);
-        if (setpnt_counts < 0)
-        {
+        if (setpnt_counts < 0) {
             error_distance = -error_distance;
         }
 
@@ -73,22 +42,19 @@ void p2p_pid(MotorController m1, MotorController m2, int dist, double error_thre
 
         previous_error = error_distance;
 
-        if (pv_error <= error_thresh)
-        {
-            m1.rotate(0);
-            m2.rotate(0);
+        if (pv_error <= error_thresh) {
+            m1.rotate(0, 0);  // **Fixed missing speed parameter**
+            m2.rotate(0, 0);  // **Fixed missing speed parameter**
             break;
         }
-        else if (error_distance > setpnt_counts / 4)
-        {
+        else if (error_distance > setpnt_counts / 4) {
             Serial.println("Exec");
-            m2.rotate(min(max(target_speed + pv_sync, initial_speed), 200));
-            m1.rotate(min(max(target_speed - pv_sync, initial_speed), 200));
+            m2.rotate(1, min(max((int)(target_speed + pv_sync), initial_speed), 200));  // **Fixed incorrect min/max usage**
+            m1.rotate(1, min(max((int)(target_speed - pv_sync), initial_speed), 200));
         }
-        else
-        {
-            m2.rotate(min(max(target_speed, initial_speed), 200));
-            m1.rotate(min(max(target_speed, initial_speed), 200));
+        else {
+            m2.rotate(1, min(max((int)target_speed, initial_speed), 200));
+            m1.rotate(1, min(max((int)target_speed, initial_speed), 200));
         }
     }
 }
@@ -109,24 +75,32 @@ void M2_Encoder_ISR() {
     }
 }
 
+// **Define motor control pins before creating MotorController instances**
+#define M1_in1 5
+#define M1_in2 6
+#define M1_ENC_A 2
+#define M1_ENC_B 3
+#define M1_PWM 9
+
+#define M2_in1 7
+#define M2_in2 8
+#define M2_ENC_A 18
+#define M2_ENC_B 19
+#define M2_PWM 10
+
 MotorController motor1(M1_in1, M1_in2, M1_ENC_A, M1_ENC_B, M1_PWM);
 MotorController motor2(M2_in1, M2_in2, M2_ENC_A, M2_ENC_B, M2_PWM);
 
-void setup(){
-  Serial.begin(9600);
-   motor1Ptr = &motor1;
+void setup() {
+    Serial.begin(9600);
+    motor1Ptr = &motor1;
     motor2Ptr = &motor2;
 
-    // Attach interrupts for each motor's encoder (using the encoder A pins)
     attachInterrupt(digitalPinToInterrupt(M1_ENC_A), M1_Encoder_ISR, RISING);
-    attachInterrupt(digitalPinToInterrupt(M2_ENC_B), M2_Encoder_ISR, RISING);
+    attachInterrupt(digitalPinToInterrupt(M2_ENC_A), M2_Encoder_ISR, RISING);  // **Fixed incorrect interrupt pin**
 }
 
-void loop()
-{
-  // Serial.print(count_pulses_left);
-  // Serial.print("   ");
-  // Serial.println(count_pulses_right);
-  p2p_pid(motor1, motor2, 25);
-  delay(2000);
+void loop() {
+    p2p_pid(motor1, motor2, 25);
+    delay(2000);
 }
