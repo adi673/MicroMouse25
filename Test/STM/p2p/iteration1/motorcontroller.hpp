@@ -1,18 +1,34 @@
-#ifndef MOTOR_CONTROLLER_H
-#define MOTOR_CONTROLLER_H
+#ifndef MOTORCONTROLLER_HPP
+#define MOTORCONTROLLER_HPP
 
 #include <Arduino.h>
+
 #define WHEEL_DIAMETER 3.4
-#define ENCODER_COUNTS_PER_REVOLUTION 650
+#define ENCODER_COUNTS_PER_REVOLUTION 360  // Define your encoder resolution
 
 class MotorController {
 public:
-    MotorController(int in1, int in2, int enca, int encb, int pwm);
-    void rotate(int speed);
-    double req_counts(int distance);
+    // Motor control and encoder pins
+    uint8_t in1, in2, encA, encB, pwm;
+    volatile long countPulses;  // Use volatile because it's updated in an ISR
 
-    int in1, in2, enca, encb, pwm;
-    int count_pulses;
+    // Constructor
+    MotorController(uint8_t in1, uint8_t in2, uint8_t encA, uint8_t encB, uint8_t pwm);
+
+    // Rotate the motor: dir = 1 for forward, -1 for reverse, 0 for stop
+    void rotate(int dir, int speed);
+
+    // This method is called by the ISR to update the encoder count
+    void encoderInterrupt();
+
+    // Reset the encoder count to zero
+    void resetEncoder();
+
+    // Return the current encoder count
+    long getCount();
+
+    // Calculate required encoder counts to travel a certain distance
+    double req_counts(int distance);
 };
 
-#endif
+#endif // MOTORCONTROLLER_HPP

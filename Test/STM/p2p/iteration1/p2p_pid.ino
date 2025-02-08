@@ -2,29 +2,29 @@
 
 int count_pulses_left = 0, count_pulses_right =0;
 
-void encoderInterrupt_left(){
-    int b = digitalRead(5);
-    if (b > 0)
-    {
-        count_pulses_left++;
-    }
-    else
-    {
-        count_pulses_left--;
-    }
-}
+// void encoderInterrupt_left(){
+//     int b = digitalRead(5);
+//     if (b > 0)
+//     {
+//         count_pulses_left++;
+//     }
+//     else
+//     {
+//         count_pulses_left--;
+//     }
+// }
 
-void encoderInterrupt_right(){
-    int b = digitalRead(4);
-    if (b > 0)
-    {
-        count_pulses_right++;
-    }
-    else
-    {
-        count_pulses_right--;
-    }
-}
+// void encoderInterrupt_right(){
+//     int b = digitalRead(4);
+//     if (b > 0)
+//     {
+//         count_pulses_right++;
+//     }
+//     else
+//     {
+//         count_pulses_right--;
+//     }
+// }
 
 void p2p_pid(MotorController m1, MotorController m2, int dist, double error_thresh = 0.3, int ramp_duration = 5000)
 {
@@ -94,10 +94,9 @@ void p2p_pid(MotorController m1, MotorController m2, int dist, double error_thre
 }
 
 
-// MotorController motor1(7, 8, 3, 5, 9);
-// MotorController motor2(A1, A2, 2, 4, 10);
-MotorController motor1(8, 7, 3, 5, 9);
-MotorController motor2(A2, A1, 2, 4, 10);
+
+MotorController motor1(M1_in1, M1_in2, M1_ENC_A, M1_ENC_B, M1_PWM);
+MotorController motor2(M2_in1, M2_in2, M2_ENC_A, M2_ENC_B, M2_PWM);
 
 void setup(){
   Serial.begin(9600);
