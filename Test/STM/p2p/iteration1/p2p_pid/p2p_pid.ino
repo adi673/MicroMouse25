@@ -104,6 +104,7 @@ void setup() {
 
 void loop() {
     p2p_pid(motor1, motor2, 25);
-
+    motor1.rotate(0,0);
+    motor2.rotate(0,0);
     delay(10000);
 }

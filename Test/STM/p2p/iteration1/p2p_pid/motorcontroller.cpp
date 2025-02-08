@@ -54,5 +54,7 @@ long MotorController::getCount() {
 double MotorController::req_counts(int distance) {
     double rotatn_req = distance / (3.14 * WHEEL_DIAMETER);
     double setpnt_counts = rotatn_req * ENCODER_COUNTS_PER_REVOLUTION;
+    Serial.println("Required encoder counts : ");
+    Serial.println(setpnt_counts);
     return setpnt_counts;
 }

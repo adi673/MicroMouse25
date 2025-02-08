@@ -4,7 +4,7 @@
 #include <Arduino.h>
 
 #define WHEEL_DIAMETER 3.4
-#define ENCODER_COUNTS_PER_REVOLUTION 360  // Define your encoder resolution
+#define ENCODER_COUNTS_PER_REVOLUTION 426  // Define your encoder resolution
 
 class MotorController {
 public:

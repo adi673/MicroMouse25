@@ -18,6 +18,28 @@
 #define M2_in2 PA5      // Right Motor Direction 2
 
 #define PUSH_BUTTON PB15
+int count_pulses_left = 0, count_pulses_right =0;
+
+void encoderInterrupt_left() {
+    int b = digitalRead(M1_ENC_B);
+    if (b > 0) {
+        count_pulses_left++;
+    }
+    else {
+        count_pulses_left--;
+    }
+}
+
+void encoderInterrupt_right() {
+    int b = digitalRead(M2_ENC_B);
+    if (b > 0) {
+        count_pulses_right++;
+    }
+    else {
+        count_pulses_right--;
+    }
+}
+
 
 // MotorController Class
 class MotorController {
@@ -55,15 +77,7 @@ public:
     }
 
     // This method is called by the ISR to update the encoder count
-    void encoderInterrupt() {
-        int b = digitalRead(encB);
-        if (b > 0) {
-            countPulses++;
-        }
-        else {
-            countPulses--;
-        }
-    }
+    
 
     // Reset the encoder count to zero
     void resetEncoder() {
@@ -81,17 +95,17 @@ MotorController* motor1Ptr = nullptr;
 MotorController* motor2Ptr = nullptr;
 
 // Global ISR functions call the appropriate object's encoderInterrupt method
-void M1_Encoder_ISR() {
-    if (motor1Ptr) {
-        motor1Ptr->encoderInterrupt();
-    }
-}
+// void M1_Encoder_ISR() {
+//     if (motor1Ptr) {
+//         motor1Ptr->encoderInterrupt();
+//     }
+// }
 
-void M2_Encoder_ISR() {
-    if (motor2Ptr) {
-        motor2Ptr->encoderInterrupt();
-    }
-}
+// void M2_Encoder_ISR() {
+//     if (motor2Ptr) {
+//         motor2Ptr->encoderInterrupt();
+//     }
+// }
 
 // Instantiate MotorController objects using the defined pins
 MotorController motor1(M1_in1, M1_in2, M1_ENC_A, M1_ENC_B, M1_PWM);
@@ -105,8 +119,8 @@ void setup() {
     motor2Ptr = &motor2;
 
     // Attach interrupts for each motor's encoder (using the encoder A pins)
-    attachInterrupt(digitalPinToInterrupt(M1_ENC_A), M1_Encoder_ISR, RISING);
-    attachInterrupt(digitalPinToInterrupt(M2_ENC_B), M2_Encoder_ISR, RISING);
+    attachInterrupt(digitalPinToInterrupt(M1_ENC_A), encoderInterrupt_left, RISING);
+    attachInterrupt(digitalPinToInterrupt(M2_ENC_B), encoderInterrupt_right, RISING);
 }
 
 void loop() {
@@ -116,9 +130,9 @@ void loop() {
 
     // Print encoder counts to Serial Monitor every 100ms
     Serial.print("Result A: ");
-    Serial.print(motor1.getCount());
+    Serial.print(count_pulses_left);
     Serial.print("   Results B: ");
-    Serial.println(motor2.getCount());
+    Serial.println(count_pulses_right);
 
     delay(100);
 }
