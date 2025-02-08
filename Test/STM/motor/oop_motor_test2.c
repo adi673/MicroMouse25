@@ -106,7 +106,7 @@ void setup() {
 
     // Attach interrupts for each motor's encoder (using the encoder A pins)
     attachInterrupt(digitalPinToInterrupt(M1_ENC_A), M1_Encoder_ISR, RISING);
-    attachInterrupt(digitalPinToInterrupt(M2_ENC_A), M2_Encoder_ISR, RISING);
+    attachInterrupt(digitalPinToInterrupt(M2_ENC_B), M2_Encoder_ISR, RISING);
 }
 
 void loop() {
