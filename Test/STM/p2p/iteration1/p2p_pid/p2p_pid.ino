@@ -19,22 +19,33 @@ int count_pulses_left = 0, count_pulses_right = 0;
 
 
 void encoderInterrupt_left() {
-    int b = digitalRead(M1_ENC_B);
-    if (b > 0) {
+    // int b = digitalRead(M1_ENC_B);
+    // if (b > 0) {
+    //     count_pulses_left++;
+    // }
+    // else {
+    //     count_pulses_left--;
+    // }
+     if (digitalRead(M1_ENC_B) == digitalRead(M1_ENC_A)) {
         count_pulses_left++;
-    }
-    else {
+    } else {
         count_pulses_left--;
     }
 }
 
 void encoderInterrupt_right() {
-    int b = digitalRead(M2_ENC_B);
-    if (b > 0) {
-        count_pulses_right++;
-    }
-    else {
-        count_pulses_right--;
+    // int b = digitalRead(M2_ENC_B);
+    // if (b > 0) {
+    //     count_pulses_right++;
+    // }
+    // else {
+    //     count_pulses_right--;
+    // }
+
+     if (digitalRead(M2_ENC_B) == digitalRead(M2_ENC_A)) {
+         count_pulses_right++;
+    } else {
+       count_pulses_right--;
     }
 }
 
@@ -177,7 +188,7 @@ void encoderInterrupt_right() {
 
 void p2p_pid(MotorController& m1, MotorController& m2, int dist, double error_thresh = 0.3, int ramp_duration = 5000)  
 {
-     double setpnt_counts = 385.422; //m1.req_counts(dist);
+    //  double setpnt_counts = m1.req_counts(dist); /385.422;
     Serial.print("Required counts: ");
     Serial.println(setpnt_counts);
 
