@@ -186,78 +186,78 @@ void encoderInterrupt_right() {
 // }
 
 
-// void p2p_pid(MotorController& m1, MotorController& m2, int dist, double error_thresh = 0.3, int ramp_duration = 5000)  
-// {
-//     double setpnt_counts = m1.req_counts(dist); //385.422;
-//     Serial.print("Required counts: ");
-//     Serial.println(setpnt_counts);
+void p2p_pid(MotorController& m1, MotorController& m2, int dist, double error_thresh = 0.3, int ramp_duration = 5000)  
+{
+    double setpnt_counts = m1.req_counts(dist); //385.422;
+    Serial.print("Required counts: ");
+    Serial.println(setpnt_counts);
 
-//     // count_pulses_left = 0;
-//     // count_pulses_right = 0;
+    count_pulses_left = 0;
+    count_pulses_right = 0;
 
-//     // double kp_error = 0.4, kd_error = 1;
-//     // double kp_sync = 0.08, kd_sync = 0.03;  // Adjusted for better balance
+    // double kp_error = 0.4, kd_error = 1;
+    // double kp_sync = 0.08, kd_sync = 0.03;  // Adjusted for better balance
 
-//     // double derivative_error = 0, derivative_sync = 0;
-//     // double previous_error = 0, previous_sync = 0;
+    double derivative_error = 0, derivative_sync = 0;
+    double previous_error = 0, previous_sync = 0;
 
-//     // unsigned long start_time = millis();
-//     // int initial_speed = 20;
+    unsigned long start_time = millis();
+    int initial_speed = 20;
 
-//     // while (true) {
-//     //     unsigned long elapsed_time = millis() - start_time;
-//     //     int target_speed = map(constrain(elapsed_time, 0, ramp_duration), 0, ramp_duration, initial_speed, 200);
+    while (true) {
+        // unsigned long elapsed_time = millis() - start_time;
+        // int target_speed = map(constrain(elapsed_time, 0, ramp_duration), 0, ramp_duration, initial_speed, 200);
 
-//     //     double error_distance = abs(setpnt_counts) - abs(count_pulses_left);
-//     //     if (setpnt_counts < 0) {
-//     //         error_distance = -error_distance;
-//     //     }
+        double error_distance = abs(setpnt_counts) - abs(count_pulses_left);
+        if (setpnt_counts < 0) {
+            error_distance = -error_distance;
+        }
 
-//     //     int error_sync = count_pulses_left - count_pulses_right;  // Corrected sync error calculation
+        // int error_sync = count_pulses_left - count_pulses_right;  // Corrected sync error calculation
 
-//     //     Serial.print("Distance Error: ");
-//     //     Serial.print(error_distance);
-//     //     Serial.print("\tSync Error: ");
-//     //     Serial.println(error_sync);
+        Serial.print("Distance Error: ");
+        Serial.print(error_distance);
+        Serial.print("\tSync Error: ");
+        Serial.println(error_sync);
 
-//     //     // Adjust kp_sync dynamically if sync error is consistently large
-//     //     if (abs(error_sync) > 300) {
-//     //         kp_sync = 0.1;
-//     //         kd_sync = 0.05;
-//     //     } else {
-//     //         kp_sync = 0.08;
-//     //         kd_sync = 0.03;
-//     //     }
+        // Adjust kp_sync dynamically if sync error is consistently large
+        // if (abs(error_sync) > 300) {
+        //     kp_sync = 0.1;
+        //     kd_sync = 0.05;
+        // } else {
+        //     kp_sync = 0.08;
+        //     kd_sync = 0.03;
+        // }
 
-//     //     double pv_error = kp_error * error_distance + kd_error * (error_distance - previous_error);
-//     //     double pv_sync = kp_sync * error_sync + kd_sync * (error_sync - previous_sync);
+        double pv_error = kp_error * error_distance + kd_error * (error_distance - previous_error);
+        // double pv_sync = kp_sync * error_sync + kd_sync * (error_sync - previous_sync);
 
-//     //     // Clamp sync correction to avoid extreme values
-//     //     pv_sync = constrain(pv_sync, -15, 15); 
+        // Clamp sync correction to avoid extreme values
+        // pv_sync = constrain(pv_sync, -15, 15); 
 
-//     //     derivative_error = error_distance - previous_error;
-//     //     derivative_sync = error_sync - previous_sync;
+        derivative_error = error_distance - previous_error;
+        // derivative_sync = error_sync - previous_sync;
 
-//     //     previous_error = error_distance;
-//     //     previous_sync = error_sync;
+        previous_error = error_distance;
+        // previous_sync = error_sync;
 
-//     //     if (pv_error <= error_thresh) {
-//     //         m1.rotate(0, 0);
-//     //         m2.rotate(0, 0);
-//     //         break;
-//     //     }
-//     //     else if (error_distance > setpnt_counts / 4) {
-//     //         Serial.println("Executing sync correction...");
-//     //         m2.rotate(1, min(max((int)(target_speed - pv_sync), initial_speed), 200));
-//     //         m1.rotate(1, min(max((int)(target_speed + pv_sync), initial_speed), 200));
-//     //     }
-//     //     else {
-//     //         m2.rotate(1, min(max((int)target_speed, initial_speed), 200));
-//     //         m1.rotate(1, min(max((int)target_speed, initial_speed), 200));
-//     //     }
-//     // } 
-//     Serial.printf("Reached end");
-// }
+        if (pv_error <= error_thresh) {
+            m1.rotate(0, 0);
+            m2.rotate(0, 0);
+            break;
+        }
+        else if (error_distance > setpnt_counts / 4) {
+            Serial.println("Executing sync correction...");
+            m2.rotate(1, min(max((int)(target_speed - pv_sync), initial_speed), 200));
+            m1.rotate(1, min(max((int)(target_speed + pv_sync), initial_speed), 200));
+        }
+        else {
+            m2.rotate(1, min(max((int)target_speed, initial_speed), 200));
+            m1.rotate(1, min(max((int)target_speed, initial_speed), 200));
+        }
+    } 
+    Serial.printf("Reached end");
+}
 
 
 
