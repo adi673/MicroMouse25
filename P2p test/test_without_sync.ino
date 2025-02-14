@@ -69,6 +69,20 @@ void pid_control()
         control_left = kp * error_left + kd * (error_left - last_error_left);
         control_right = kp * error_right + kd * (error_right - last_error_right);
 
+        Serial.print("error left : ");
+        Serial.print(error_left);
+        Serial.print("errorleft : ");
+        Serial.println(control_right);
+
+        Serial.println("");
+        Serial.println("");
+
+        
+        Serial.print("control left : ");
+        Serial.print(control_left);
+        Serial.print("control left : ");
+        Serial.println(control_right);
+
         last_error_left = error_left;
         last_error_right = error_right;
 
