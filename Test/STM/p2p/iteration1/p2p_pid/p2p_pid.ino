@@ -9,12 +9,12 @@ int count_pulses_left = 0, count_pulses_right = 0;
 #define M2_ENC_B PB8    // Right Encoder B
 
 // Motor Control Pins
-#define M1_PWM PA0    // Left Motor PWM
-#define M2_PWM PA1    // Right Motor PWM
-#define M1_in1 PA2     // Left Motor Direction 1
-#define M1_in2 PA3     // Left Motor Direction 2
-#define M2_in1 PA4     // Right Motor Direction 1
-#define M2_in2 PA5     // Right Motor Direction 2
+#define M1_PWM PA1    // Left Motor PWM
+#define M2_PWM PA0    // Right Motor PWM
+#define M1_in1 PA4     // Left Motor Direction 1
+#define M1_in2 PA5     // Left Motor Direction 2
+#define M2_in1 PA3     // Right Motor Direction 1
+#define M2_in2 PA2     // Right Motor Direction 2
 
 
 
